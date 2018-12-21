@@ -20,13 +20,15 @@ minimumMasterNodes: 2
 # This will be appended to the current 'env:' key. You can use any of the kubernetes env
 # syntax here
 extraEnvs:
-#  - name: MY_ENVIRONMENT_VAR
-#    value: the_value_goes_here
+ - name: discovery.zen.ping_timeout
+   value: 3s
+ - name: discovery.zen.fd.ping_timeout
+   value: 3s
 
 # A list of secrets and their paths to mount inside the pod
 # This is useful for mounting certificates for security and for mounting
 # the X-Pack license
-secretMounts: 
+secretMounts:
 #  - name: elastic-certificates
 #    secretName: elastic-certificates
 #    path: /usr/share/elasticsearch/config/certs
@@ -35,32 +37,32 @@ image: "docker.elastic.co/elasticsearch/elasticsearch"
 imageTag: "6.5.3"
 imagePullPolicy: "IfNotPresent"
 
-esJavaOpts: "-Xmx1g -Xms1g"
+esJavaOpts: "-Xmx512m -Xms512m"
 
 resources:
   requests:
-    cpu: "100m"
-    memory: "2Gi"
+    cpu: "10m"
+    memory: "768Mi"
   limits:
     cpu: "1000m"
-    memory: "2Gi"
+    memory: "768Mi"
 
 networkHost: "0.0.0.0"
 
 volumeClaimTemplate:
   accessModes: [ "ReadWriteOnce" ]
-  storageClassName: "standard"
+  storageClassName: "gp2"
   resources:
     requests:
-      storage: 30Gi
+      storage: 1Gi
 
 # By default this will make sure two pods don't end up on the same node
 # Changing this to a region would allow you to spread pods across regions
-antiAffinityTopologyKey: "kubernetes.io/hostname" 
+antiAffinityTopologyKey: "kubernetes.io/hostname"
 
 # Hard means that by default pods will only be scheduled if there are enough nodes for them
 # and that they will never end up on the same node. Setting this to soft will do this "best effort"
-antiAffinity: "hard"
+antiAffinity: "soft"
 
 # The default is to deploy all pods serially. By setting this to parallel all pods are started at
 # the same time when bootstrapping the cluster
