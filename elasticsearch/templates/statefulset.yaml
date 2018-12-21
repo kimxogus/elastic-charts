@@ -17,11 +17,11 @@ spec:
   podManagementPolicy: {{ .Values.podManagementPolicy }}
   updateStrategy:
     type: {{ .Values.updateStrategy }}
-  volumeClaimTemplates:
-  - metadata:
-      name: {{ template "uname" . }}
-    spec:
-{{ toYaml .Values.volumeClaimTemplate | indent 6 }}
+#   volumeClaimTemplates:
+#   - metadata:
+#       name: {{ template "uname" . }}
+#     spec:
+# {{ toYaml .Values.volumeClaimTemplate | indent 6 }}
   template:
     metadata:
       name: "{{ template "uname" . }}"
