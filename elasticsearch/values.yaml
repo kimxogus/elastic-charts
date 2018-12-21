@@ -20,7 +20,7 @@ minimumMasterNodes: 2
 # This will be appended to the current 'env:' key. You can use any of the kubernetes env
 # syntax here
 extraEnvs:
-- name: log.level
+- name: logger.level
   value: debug
 - name: discovery.zen.ping_timeout
   value: 3s
