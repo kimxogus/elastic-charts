@@ -315,6 +315,14 @@ tolerations:
     r = helm_template(config)
     assert r['statefulset'][uname]['spec']['template']['spec']['tolerations'][0]['key'] == 'key1'
 
+def test_adding_pod_annotations():
+    config = '''
+podAnnotations:
+  iam.amazonaws.com/role: es-role
+'''
+    r = helm_template(config)
+    assert r['statefulset'][uname]['spec']['template']['metadata']['annotations']['iam.amazonaws.com/role'] == 'es-role'
+
 
 def test_adding_a_node_selector():
     config = '''
@@ -411,6 +419,14 @@ protocol: https
     r = helm_template(config)
     c = r['statefulset'][uname]['spec']['template']['spec']['containers'][0]
     assert 'https://127.0.0.1:9200' in c['readinessProbe']['exec']['command'][-1]
+
+def test_changing_the_cluster_health_status():
+    config = '''
+clusterHealthCheckParams: 'wait_for_no_initializing_shards=true&timeout=60s'
+'''
+    r = helm_template(config)
+    c = r['statefulset'][uname]['spec']['template']['spec']['containers'][0]
+    assert '/_cluster/health?wait_for_no_initializing_shards=true&timeout=60s' in c['readinessProbe']['exec']['command'][-1]
 
 def test_adding_in_es_config():
     config = '''

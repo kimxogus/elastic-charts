@@ -29,7 +29,7 @@ This helm chart is a lightweight way to configure and run our official [Elastics
   ```
 * Install it
   ```
-  helm install --name elasticsearch elastic/elasticsearch --version 6.5.4-alpha3
+  helm install --name elasticsearch elastic/elasticsearch --version 6.6.0-alpha1
   ```
 
 
@@ -43,16 +43,17 @@ This helm chart is a lightweight way to configure and run our official [Elastics
 | `roles`                   | A hash map with the [specific roles](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-node.html) for the node group                                                                                                                                                                                 | `master: true`<br>`data: true`<br>`ingest: true`                                                                          |
 | `replicas`                | Kubernetes replica count for the statefulset (i.e. how many pods)                                                                                                                                                                                                                                                          | `3`                                                                                                                       |
 | `minimumMasterNodes`      | The value for [discovery.zen.minimum_master_nodes](https://www.elastic.co/guide/en/elasticsearch/reference/current/discovery-settings.html#minimum_master_nodes). Should be set to `(replicas / 2) + 1`                                                                                                                    | `2`                                                                                                                       |
-| `esMajorVersion`          | Used to set major version specific configuration. Will set `discovery.zen.minimum_master_nodes` by default and `cluster.initial_master_nodes` for versions >= 7 | `6`                                                                                                                       |
-| `esConfig`                | Allows you to add any config files in `/usr/share/elasticsearch/config/` such as `elasticsearch.yml` and `log4j2.properties`. See [values.yaml](./values.yaml) for an example of the formatting. | `{}`                                                                                                                       |
+| `esMajorVersion`          | Used to set major version specific configuration. Will set `discovery.zen.minimum_master_nodes` by default and `cluster.initial_master_nodes` for versions >= 7                                                                                                                                                            | `6`                                                                                                                       |
+| `esConfig`                | Allows you to add any config files in `/usr/share/elasticsearch/config/` such as `elasticsearch.yml` and `log4j2.properties`. See [values.yaml](./values.yaml) for an example of the formatting.                                                                                                                           | `{}`                                                                                                                      |
 | `extraEnvs`               | Extra [environment variables](https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/#using-environment-variables-inside-of-your-config) which will be appended to the `env:` definition for the container                                                                         | `{}`                                                                                                                      |
 | `secretMounts`            | Allows you easily mount a secret as a file inside the statefulset. Useful for mounting certificates and other secrets. See [values.yaml](./values.yaml) for an example                                                                                                                                                     | `{}`                                                                                                                      |
 | `image`                   | The Elasticsearch docker image                                                                                                                                                                                                                                                                                             | `docker.elastic.co/elasticsearch/elasticsearch`                                                                           |
-| `imageTag`                | The Elasticsearch docker image tag                                                                                                                                                                                                                                                                                         | `6.5.4`                                                                                                                   |
+| `imageTag`                | The Elasticsearch docker image tag                                                                                                                                                                                                                                                                                         | `6.6.0`                                                                                                                   |
 | `imagePullPolicy`         | The Kubernetes [imagePullPolicy](https://kubernetes.io/docs/concepts/containers/images/#updating-images) value                                                                                                                                                                                                             | `IfNotPresent`                                                                                                            |
+| `podAnnotations`          | Configurable [annotations](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/) applied to all Elasticsearch pods                                                                                                                                                                               | `{}`                                                                                                                      |
 | `esJavaOpts`              | [Java options](https://www.elastic.co/guide/en/elasticsearch/reference/current/jvm-options.html) for Elasticsearch. This is where you should configure the [jvm heap size](https://www.elastic.co/guide/en/elasticsearch/reference/current/heap-size.html)                                                                 | `-Xmx1g -Xms1g`                                                                                                           |
 | `resources`               | Allows you to set the [resources](https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/) for the statefulset                                                                                                                                                                               | `requests.cpu: 100m`<br>`requests.memory: 2Gi`<br>`limits.cpu: 1000m`<br>`limits.memory: 2Gi`                             |
-| `initResources`               | Allows you to set the [resources](https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/) for the initContainer in the statefulset                                                                                                                                                                               | {}                             |
+| `initResources`           | Allows you to set the [resources](https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/) for the initContainer in the statefulset                                                                                                                                                          | {}                                                                                                                        |
 | `networkHost`             | Value for the [network.host Elasticsearch setting](https://www.elastic.co/guide/en/elasticsearch/reference/current/network.host.html)                                                                                                                                                                                      | `0.0.0.0`                                                                                                                 |
 | `volumeClaimTemplate`     | Configuration for the [volumeClaimTemplate for statefulsets](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#stable-storage). You will want to adjust the storage (default `30Gi`) and the `storageClassName` if you are using a different storage class                                            | `accessModes: [ "ReadWriteOnce" ]`<br>`storageClassName: standard`<br>`resources.requests.storage: 30Gi`                  |
 | `antiAffinityTopologyKey` | The [anti-affinity topology key](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity). By default this will prevent multiple Elasticsearch nodes from running on the same Kubernetes node                                                                                        | `kubernetes.io/hostname`                                                                                                  |
@@ -67,7 +68,8 @@ This helm chart is a lightweight way to configure and run our official [Elastics
 | `fsGroup`                 | The Group ID (GID) for [securityContext.fsGroup](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) so that the Elasticsearch user can read from the persistent volume                                                                                                                            | `1000`                                                                                                                    |
 | `terminationGracePeriod`  | The [terminationGracePeriod](https://kubernetes.io/docs/concepts/workloads/pods/pod/#termination-of-pods) in seconds used when trying to stop the pod                                                                                                                                                                      | `120`                                                                                                                     |
 | `sysctlVmMaxMapCount`     | Sets the [sysctl vm.max_map_count](https://www.elastic.co/guide/en/elasticsearch/reference/current/vm-max-map-count.html#vm-max-map-count) needed for Elasticsearch                                                                                                                                                        | `262144`                                                                                                                  |
-| `readinessProbe`          | Configuration for the [readinessProbe](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/)                                                                                                                                                                                      | `failureThreshold: 3`<br>`initialDelaySeconds: 10`<br>`periodSeconds: 10`<br>`successThreshold: 3`<br>`timeoutSeconds: 5` |
+| `readinessProbe`          | Configuration fields for the [readinessProbe](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/)                                                                                                                                                                                     | `failureThreshold: 3`<br>`initialDelaySeconds: 10`<br>`periodSeconds: 10`<br>`successThreshold: 3`<br>`timeoutSeconds: 5` |
+| `clusterHealthCheckParams`          | The [Elasticsearch cluster health status params](https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-health.html#request-params) that will be used by readinessProbe command                                                                                                                                                                            | `wait_for_status=green&timeout=1s` |
 | `imagePullSecrets`        | Configuration for [imagePullSecrets](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/#create-a-pod-that-uses-your-secret) so that you can use a private registry for your image                                                                                                       | `[]`                                                                                                                      |
 | `nodeSelector`            | Configurable [nodeSelector](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector) so that you can target specific nodes for your Elasticsearch cluster                                                                                                                                          | `{}`                                                                                                                      |
 | `tolerations`             | Configurable [tolerations](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/)                                                                                                                                                                                                                        | `[]`                                                                                                                      |
@@ -130,6 +132,44 @@ A cluster with X-Pack security enabled
   ```
   wget https://download.elastic.co/demos/kibana/gettingstarted/logs.jsonl.gz && gunzip logs.jsonl.gz && curl -u elastic:changeme -H 'Content-Type: application/x-ndjson' -XPOST 'localhost:9200/_bulk?pretty' --data-binary @logs.jsonl
   ```
+
+### FAQ
+
+#### How to install plugins?
+
+The [recommended](https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html#_c_customized_image) way to install plugins into our docker images is to create a custom docker image.
+
+The Dockerfile would look something like:
+
+```
+ARG elasticsearch_version
+FROM docker.elastic.co/elasticsearch/elasticsearch:${elasticsearch_version}
+
+RUN bin/elasticsearch-plugin install --batch repository-gcs
+```
+
+And then updating the `image` in values to point to your custom image.
+
+There are a couple reasons we recommend this.
+
+1. Tying the availability of Elasticsearch to the download service to install plugins is not a great idea or something that we recommend. Especially in Kubernetes where it is normal and expected for a container to be moved to another host at random times.
+2. Mutating the state of a running docker image (by installing plugins) goes against best practices of containers and immutable infrastructure.
+
+#### How to use the keystore?
+
+1. Create a Kubernetes secret containing the [keystore](https://www.elastic.co/guide/en/elasticsearch/reference/current/secure-settings.html)
+    ```
+    $ kubectl create secret generic elasticsearch-keystore --from-file=./elasticsearch.keystore
+    ```
+2. Mount it into the container via `secretMounts`
+    ```
+    secretMounts:
+    - name: elasticsearch-keystore
+      secretName: elasticsearch-keystore
+      path: /usr/share/elasticsearch/config/elasticsearch.keystore
+      subPath: elasticsearch.keystore
+    ```
+
 
 ### Local development environments
 
