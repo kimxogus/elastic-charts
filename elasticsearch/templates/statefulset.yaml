@@ -140,7 +140,7 @@ spec:
           if [ ! -f /usr/share/elasticsearch/config/elasticsearch.yml ]; then
               touch /usr/share/elasticsearch/config/elasticsearch.yml
           fi;
-          echo "network.host: ${HOST}" >> /usr/share/elasticsearch/config/elasticsearch.yml;
+          echo "network.publish_host: ${HOST}" >> /usr/share/elasticsearch/config/elasticsearch.yml;
           echo "transport.publish_host: ${HOST}" >> /usr/share/elasticsearch/config/elasticsearch.yml;
         volumeMounts:
         - name: config
